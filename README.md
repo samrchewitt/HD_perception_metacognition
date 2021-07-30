@@ -1,2 +1,2 @@
 # HD_perception_metacognition
-Task data and code used in analysis 
+Full data and code will be available after manuscript acceptance 
