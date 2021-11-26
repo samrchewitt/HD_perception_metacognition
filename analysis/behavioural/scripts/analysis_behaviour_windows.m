@@ -31,15 +31,14 @@ sdev(:,3) = std(correct_early_mean, 0, 2); %stdev early HD
 sem(:,3) = sdev(:,3) / sqrt(length(correct_early_mean)) %sem early HD
 
 %plot the bars, errors=sem
-t=tiledlayout(2,2) % use tiled layour to plot together
-figure('Renderer', 'painters', 'Position', [10 10 1200 800]); nexttile
+figure('Renderer', 'painters', 'Position', [0 0 860 740]); nexttile
 b = bar([1, 2, 3], means, 0.75)
 b.FaceColor = 'flat';
 b.CData(1,:) = [0.5 0.5 0.5];
 b.CData(2,:) = [1 1 1];
 b.CData(3,:) = [0.85 0.85 0.85];
 hold on
-errorbar([1, 2, 3], means, sem,'.', 'color', 'black', 'lineWidth', 1.2, 'CapSize', 30)
+errorbar([1, 2, 3], means, sem,'.', 'color', 'black', 'lineWidth', 1.2, 'CapSize', 20)
 set(gca, 'YLim', [50 100], 'FontSize', 14); %larger font
 
 %plot the individual data points (scatter)
@@ -94,7 +93,7 @@ else
     T = text(min(get(gca, 'xlim')), max(get(gca, 'ylim')), str); 
     set(T, 'fontsize', 12, 'verticalalignment', 'top', 'horizontalalignment', 'left');
 end
-xticklabels({'Control', 'Pre-HD', 'Early-HD'})
+xt={'Control', 'Pre-HD', 'Early-HD'}; set(gca,'XTickLabel',xt,'fontsize',12)
 ylabel('% correct')
 title('(A) Accuracy')
 box off
@@ -123,7 +122,7 @@ b.FaceColor = 'flat';
 b.CData(1,:) = [0.5 0.5 0.5];
 b.CData(2,:) = [1 1 1];
 b.CData(3,:) = [0.85 0.85 0.85];
-hold on; errorbar([1, 2, 3], means, sem,'.', 'color', 'black', 'lineWidth', 1.2, 'CapSize', 30)
+hold on; errorbar([1, 2, 3], means, sem,'.', 'color', 'black', 'lineWidth', 1.2, 'CapSize', 20)
 
 %test equality of variance for KW vs. ANOVA:
 %normal distribution?:
@@ -180,11 +179,11 @@ else
 end
 [c_dd, m_dd] = multcompare(stats_dd, 'display', 'off', 'CType', 'bonferroni');
 %add sig stars using func
-mysigstar(gca, [1,2], 10, c_dd(1, 6)); mysigstar(gca, [1,3], 11.5, c_dd(2, 6));
-mysigstar(gca, [2,3], 10.8, c_dd(3, 6));
+mysigstar(gca, [1,2], 8.5, c_dd(1, 6)); mysigstar(gca, [1,3], 10.8, c_dd(2, 6));
+mysigstar(gca, [2,3], 10.1, c_dd(3, 6));
 
 %x and y labels
-ylabel('\Delta dots'); xticklabels({'Control', 'Pre-HD', 'Early-HD'})
+ylabel('\Delta dots'); set(gca,'XTickLabel',xt,'fontsize',12)
 title('(B) Stimulus strength'); box off
 %c contains summary data, including corrected pvalues
 %pval_exact is the precise pval for 3-way comparison
@@ -214,7 +213,7 @@ b.FaceColor = 'flat';
 b.CData(1,:) = [0.5 0.5 0.5];
 b.CData(2,:) = [1 1 1];
 b.CData(3,:) = [0.85 0.85 0.85];
-hold on; errorbar([1, 2, 3], means, sem,'.', 'color', 'black', 'lineWidth', 1.2, 'CapSize', 30)
+hold on; errorbar([1, 2, 3], means, sem,'.', 'color', 'black', 'lineWidth', 1.2, 'CapSize', 20)
 
 %test equality of variance for KW vs. ANOVA:
 %normal distribution?:
@@ -261,7 +260,8 @@ scatter(x3, rts_early_mean, 30, 'black');
 
 %x and y labels
 set(gca, 'YLim', [0 2.5], 'FontSize', 14); ylabel('RT (s)');
-xticklabels({'Control', 'Pre-HD', 'Early-HD'}); title('(C) Response time'); box off
+set(gca,'XTickLabel',xt,'fontsize',12)
+title('(C) Response time'); box off
 
 %calculate effect size:
 n2_rt = round(rdivide(tbl_rt{2, 2},tbl_rt{4,2}), 1, 'significant');
@@ -302,7 +302,7 @@ b.FaceColor = 'flat';
 b.CData(1,:) = [0.5 0.5 0.5];
 b.CData(2,:) = [1 1 1];
 b.CData(3,:) = [0.85 0.85 0.85];
-hold on; errorbar([1, 2, 3], means, sem,'.', 'color', 'black', 'lineWidth', 1.2, 'CapSize', 30)
+hold on; errorbar([1, 2, 3], means, sem,'.', 'color', 'black', 'lineWidth', 1.2, 'CapSize', 20)
 %plot the individual data points (scatter)
 ax1=gca; hold(ax1, 'all');
 scatter(x1,conf_hc_mean, 30, 'black'); hold on
@@ -341,6 +341,7 @@ else
 end
 %display the test stats
 n2_conf=round(tbl_conf{2,2}/tbl_conf{4,2}, 1, 'significant'); %calculate effect size
+set(gca, 'YLim', [0 6.5], 'FontSize', 14);
 
 if bt_p>0.05
 str=['{\it η^2} =', num2str(n2_conf) ',{\it p} = ', num2str(round(pval_conf, 2, 'significant'))];
@@ -352,17 +353,19 @@ else
     set(T, 'fontsize', 12, 'verticalalignment', 'top', 'horizontalalignment', 'left');
 end
 %x and y labels
-ylabel('Level')
-xticklabels({'Control', 'Pre-HD', 'Early-HD'})
-set(gca, 'YLim', [0 6], 'FontSize', 14);
+ylabel('Level'); 
+set(gca,'XTickLabel',xt,'fontsize',12);
 title('(D) Confidence')
 box off
 %save the figure:
 figuresdir = 'C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\analysis\behavioural\figs\';
 saveas(b, fullfile(figuresdir, 'figure2_acc_dd_rt_conf_bw'), 'fig');
 saveas(b, fullfile(figuresdir, 'figure2_acc_dd_rt_conf_bw'), 'jpeg');
+f=gcf;
+exportgraphics(f,fullfile(figuresdir, 'figure2_acc_dd_rt_conf_bw_860_720.jpeg'),'Resolution',300)
 
 %check staircase stabilisation across blocks:
+
 load('acc_blocks_hc.mat'); load('acc_blocks_pre.mat'); load('acc_blocks_early.mat')
 load('acc_blocks_hc.mat'); load('acc_blocks_pre.mat'); load('acc_blocks_early.mat')
 

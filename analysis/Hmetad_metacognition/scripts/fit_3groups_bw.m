@@ -75,7 +75,7 @@ plotSamples3grps(exp(fitpreHD.mcmc.samples.mu_logMratio), exp(fitearlyHD.mcmc.sa
 ylabel('Sample count', 'FontSize', 20); xlabel('M-ratio', 'FontSize', 20)
 box off; legend boxoff; legend('Location', 'WestOutside');
 %%% SAVE IT %%%:
-f=gcf; exportgraphics(f,[modelspath 'plotSamples3grps_bw_large.tif'],'Resolution',1200)
+exportgraphics(gcf,[modelspath 'figure3_plotHmetaSamples.jpeg'],'Resolution',300)
 
 %%% PRINT mean values %%%
 display(['Control mean M-ratio = ' num2str(mean(fitHC.Mratio))]);
@@ -103,11 +103,12 @@ mratio(:,3)=correct;
 smratio=sortrows(mratio, 1); %sort based on M-ratio
 
 %figure parameters: 
-x=(1:n)'; figure; set(0,'defaultfigurecolor','w')
+x=(1:n)'; set(0,'defaultfigurecolor','w')
+figure('Renderer', 'painters', 'Position', [0 0 1000 700]); 
 labels={'Accuracy', 'Control M-ratio', 'Pre-HD M-ratio', 'Early-HD M-ratio'};
 rgb=[0 0 0; 0 0 0; 0 0 0]; %marker colors
 mrks1=['.'; '.'; 'o']; mrks2=['o'; '^'; 'p']; %markers types
-sz1=[18, 18, 4]; sz2=[4, 10, 12]; %marker sizes
+sz1=[18, 18, 4]; sz2=[4, 6, 8]; %marker sizes
 % and PLOT: 
 plot(x,smratio(:,3), ':o', 'color', [0.5 0.5 0.5], 'MarkerSize', 2, 'LineWidth', 2) %plot accuracy
 hold on; gscatter(x,smratio(:,1), smratio(:,2), rgb, mrks2, sz2) %plot mratios
@@ -118,6 +119,8 @@ set(gca, 'XLim', [-1 n+1], 'FontSize', 20);
 set(gca, 'YLim', [min(smratio(:,1))-0.1, max(smratio(:,1))+0.1], 'FontSize', 20);
 set(gca,'xtick',[]); set(gca,'color','w');
 box off; legend boxoff 
+exportgraphics(gcf,[modelspath 'Figure4_accuracy_mratio_individual.jpeg'],'Resolution',300)
+
 
 end
 %% run GLM %%%
@@ -169,15 +172,14 @@ for d = 1:length(dv)
 end
 
 %plot the coefficients -MRATIO:
-figure;
+figure('Renderer', 'painters', 'Position', [0 0 1000 500]); 
 bar(mdl{1, 1}.Coefficients.Estimate(2:end), 'w', 'LineWidth', 1.5)
 hold on 
 er=errorbar(mdl{1, 1}.Coefficients.Estimate(2:end), mdl{1, 1}.Coefficients.SE(2:end));
 er.Color = [0 0 0]; er.LineStyle = 'none'; 
 title('M-ratio', 'FontSize', 20)
-ylabel('Regression coefficient', 'FontSize', 20);
-x={'HD+', 'Gender (male)', 'Age', 'IQ', 'MMSE', 'HADS-A', 'HADS-D'};
-set(gca,'xticklabels', x, 'FontSize', 18); ylim([-0.1, 0.25]); 
+x={'HD+', 'Gender (Male)', 'Age', 'IQ', 'MMSE', 'HADS-A', 'HADS-D'};
+set(gca,'xticklabels', x, 'FontSize', 14); ylim([-0.1, 0.25]); 
 ylabel('Regression coeffient', 'FontSize', 18);
 %add signifance: 
 mysigstar(gca, [1 1], 0.175, mdl{1, 1}.Coefficients.pValue(2), 'black');
@@ -190,6 +192,8 @@ str=['{\it R^2} = ', num2str(round(mdl{1, 1}.Rsquared.Ordinary, 2)), ', {\it p} 
 T = text(min(get(gca, 'xlim')), max(get(gca, 'ylim')), str); 
 set(T, 'fontsize', 14, 'verticalalignment', 'top', 'horizontalalignment', 'left');
 box off
+exportgraphics(gcf,[modelspath 'Figure5_Mratio_GLM.jpeg'],'Resolution',300)
+
 
 %plot the coefficients -DPRIME:
 figure; bar(mdl{1, 2}.Coefficients.Estimate(2:end), 'w'); hold on 
