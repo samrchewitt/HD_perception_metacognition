@@ -13,6 +13,7 @@ addpath(genpath(datapath)); addpath(genpath(behaviouraldata)); addpath(genpath(c
 addpath(genpath('D:\meta-hd\analysis'));  
 addpath(genpath('D:\matlab'));  
 modelspath=['C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\analysis\Hmetad_metacognition\fits\final'];
+figspath=['C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\analysis\Hmetad_metacognition\fits\final\figs'];
 
 %% jobs:
 runHmeta=0;
@@ -75,7 +76,7 @@ plotSamples3grps(exp(fitpreHD.mcmc.samples.mu_logMratio), exp(fitearlyHD.mcmc.sa
 ylabel('Sample count', 'FontSize', 20); xlabel('M-ratio', 'FontSize', 20)
 box off; legend boxoff; legend('Location', 'WestOutside');
 %%% SAVE IT %%%:
-exportgraphics(gcf,[modelspath 'figure3_plotHmetaSamples.jpeg'],'Resolution',300)
+exportgraphics(gcf,[figspath 'figure3_plotHmetaSamples.jpeg'],'Resolution',300)
 
 %%% PRINT mean values %%%
 display(['Control mean M-ratio = ' num2str(mean(fitHC.Mratio))]);
@@ -119,7 +120,7 @@ set(gca, 'XLim', [-1 n+1], 'FontSize', 20);
 set(gca, 'YLim', [min(smratio(:,1))-0.1, max(smratio(:,1))+0.1], 'FontSize', 20);
 set(gca,'xtick',[]); set(gca,'color','w');
 box off; legend boxoff 
-exportgraphics(gcf,[modelspath 'Figure4_accuracy_mratio_individual.jpeg'],'Resolution',300)
+exportgraphics(gcf,[figspath 'Figure4_accuracy_mratio_individual.jpeg'],'Resolution',300)
 
 
 end
@@ -192,7 +193,7 @@ str=['{\it R^2} = ', num2str(round(mdl{1, 1}.Rsquared.Ordinary, 2)), ', {\it p} 
 T = text(min(get(gca, 'xlim')), max(get(gca, 'ylim')), str); 
 set(T, 'fontsize', 14, 'verticalalignment', 'top', 'horizontalalignment', 'left');
 box off
-exportgraphics(gcf,[modelspath 'Figure5_Mratio_GLM.jpeg'],'Resolution',300)
+exportgraphics(gcf,[figspath 'Figure5_Mratio_GLM.jpeg'],'Resolution',300)
 
 
 %plot the coefficients -DPRIME:
