@@ -7,7 +7,11 @@ set(0, 'defaultfigurecolor', 'w');
 %define directories:
 addpath('D:\matlab\Tools-master\plotting') %plotting functions
 addpath('D:\matlab'); addpath('D:\matlab\Tools-master\');
-datapath=['C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\analysis\behavioural\summary_data\']; %data folder
+username=getenv('username');
+%searh for directory - this is slow...!
+git_dir =dir(fullfile(['C:\Users\' username '\**'],'HD_perception_metacognition')).folder;
+datapath=[git_dir '\analysis\behavioural\summary_data\'];
+figuresdir = [git_dir '\analysis\behavioural\figs\'];
 addpath(genpath(datapath));
 
 %--Figure 2a:
@@ -95,7 +99,7 @@ else
 end
 xt={'Control', 'Pre-HD', 'Early-HD'}; set(gca,'XTickLabel',xt,'fontsize',12)
 ylabel('% correct')
-title('(A) Accuracy')
+title('A. Accuracy')
 box off
 
 %--Figure 2b:
@@ -184,7 +188,7 @@ mysigstar(gca, [2,3], 10.1, c_dd(3, 6));
 
 %x and y labels
 ylabel('\Delta dots'); set(gca,'XTickLabel',xt,'fontsize',12)
-title('(B) Stimulus strength'); box off
+title('B. Stimulus strength'); box off
 %c contains summary data, including corrected pvalues
 %pval_exact is the precise pval for 3-way comparison
 
@@ -261,7 +265,7 @@ scatter(x3, rts_early_mean, 30, 'black');
 %x and y labels
 set(gca, 'YLim', [0 2.5], 'FontSize', 14); ylabel('RT (s)');
 set(gca,'XTickLabel',xt,'fontsize',12)
-title('(C) Response time'); box off
+title('C. Response time'); box off
 
 %calculate effect size:
 n2_rt = round(rdivide(tbl_rt{2, 2},tbl_rt{4,2}), 1, 'significant');
@@ -355,14 +359,13 @@ end
 %x and y labels
 ylabel('Level'); 
 set(gca,'XTickLabel',xt,'fontsize',12);
-title('(D) Confidence')
+title('D. Confidence')
 box off
 %save the figure:
-figuresdir = 'C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\analysis\behavioural\figs\';
 saveas(b, fullfile(figuresdir, 'figure2_acc_dd_rt_conf_bw'), 'fig');
 saveas(b, fullfile(figuresdir, 'figure2_acc_dd_rt_conf_bw'), 'jpeg');
 f=gcf;
-exportgraphics(f,fullfile(figuresdir, 'figure2_acc_dd_rt_conf_bw_860_720.jpeg'),'Resolution',300)
+exportgraphics(f,fullfile(figuresdir, 'figure2_acc_dd_rt_conf_bw_860_720_nobracket.jpeg'),'Resolution',300)
 
 %check staircase stabilisation across blocks:
 

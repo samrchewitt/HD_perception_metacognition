@@ -6,26 +6,34 @@
 % regressions
 clear all; close all; clc 
 %% PATHS:
-datapath=['C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\analysis\Hmetad_metacognition\summary_data\'];
-behaviouraldata=['C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\analysis\behavioural\summary_data\'];
-clinicaldata=['C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\raw_data\clinical'];
-addpath(genpath(datapath)); addpath(genpath(behaviouraldata)); addpath(genpath(clinicaldata));
-addpath(genpath('D:\meta-hd\analysis'));  
-addpath(genpath('D:\matlab'));  
-modelspath=['C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\analysis\Hmetad_metacognition\fits\final'];
-figspath=['C:\Users\samrc\OneDrive\Documents\GitHub\samrchewitt\HD_perception_metacognition\analysis\Hmetad_metacognition\fits\final\figs'];
+username=getenv('username');
+%find github dir in C drive 
+git_dir =dir(fullfile(['C:\Users\' username '\**'],'HD_perception_metacognition')).folder;
+data_dir=[git_dir '\raw_data\']; clinical_dir=[data_dir, 'clinical'];
+behavioural_dir=[git_dir '\analysis\behavioural\summary_data\'];
+hmetaD_dir = [git_dir '\analysis\Hmetad_metacognition\'];
+addpath(genpath(data_dir)); addpath(genpath(behavioural_dir)); addpath(genpath(clinical_dir));
+%addpath(genpath('D:\meta-hd\analysis'));  
+%addpath(genpath('D:\matlab'));  
+model_dir=[git_dir '\analysis\Hmetad_metacognition\fits\final'];
+figspath=[model_dir, '\figs'];
 
-%% jobs:
-runHmeta=0;
-savemodels=0;
-plotdata=1;
-runGLM=1;
+%add dependencies:
+addpath(genpath(['D:\meta-hd\analysis\HMeta-d-master'])); %Hmeta-D toolbox
+addpath('D:\matlab\Tools-master'); %plotting
+addpath('D:\matlab\jags'); %JAGS for model estimation
+
+%% jobs: set jobs you want to run 
+runHmeta=0; %fit HMeta-D to confidence and choice data
+savemodels=0; %save model fits in model_dir
+plotdata=1; % just plot data from a previous model
+runGLM=1; %run post-hoc GLM to predict metacog parameters from participant data 
 %% model fitting %%%
 if runHmeta
 % load the confidence rating vectors for each group
-load(['nR_S1prehd']); load(['nR_S2prehd']);
-load(['nR_S1earlyhd']); load(['nR_S2earlyhd']);
-load(['nR_S1hc']); load(['nR_S2hc']);
+load([hmetaD_dir 'summary_data\nR_S1prehd']); load([hmetaD_dir 'summary_data\nR_S2prehd']);
+load([hmetaD_dir 'summary_data\nR_S1earlyhd']); load([hmetaD_dir 'summary_data\nR_S2earlyhd']);
+load([hmetaD_dir 'summary_data\nR_S1hc']); load([hmetaD_dir 'summary_data\nR_S2hc']);
 
 %fit pre-HD group
 fitpreHD = fit_meta_d_mcmc_group(nR_S1prehd, nR_S2prehd);
@@ -36,7 +44,7 @@ fitHC = fit_meta_d_mcmc_group(nR_S1hc, nR_S2hc);
 
 %%% otherwise just load the previous fits:
 else 
-    addpath(modelspath);
+    addpath(model_dir);
     load('fitHC.mat'); load('fitpreHD.mat'); load('fitearlyHD.mat');
 end
 %%%% also load accuracy data: 
@@ -127,7 +135,7 @@ end
 %% run GLM %%%
 if runGLM
 %load clinical/behavioural data;
-load([clinicaldata '\metaHD_clinicaldata.mat']); load('id_hmetaD');
+load([clinical_dir '\metaHD_clinicaldata.mat']); load([hmetaD_dir 'summary_data\id_hmetaD.mat']);
 load('tBehaviour.mat');
 
 %%%MEANS FROM FITS %%%%:
@@ -162,6 +170,7 @@ tM.sex = categorical(tM.sex);
 tM.gene = categorical(tM.gene);
 
 %%%% run regressions %%%%
+%treat both HD as one group to increase power of this analysis 
 
 dv = {'mratio', 'dp', 'mdp', 'conf'};
 for d = 1:length(dv)
@@ -181,28 +190,28 @@ er.Color = [0 0 0]; er.LineStyle = 'none';
 title('M-ratio', 'FontSize', 20)
 x={'HD+', 'Gender (Male)', 'Age', 'IQ', 'MMSE', 'HADS-A', 'HADS-D'};
 set(gca,'xticklabels', x, 'FontSize', 14); ylim([-0.1, 0.25]); 
-ylabel('Regression coeffient', 'FontSize', 18);
+ylabel('Effect size', 'FontSize', 18);
 %add signifance: 
 mysigstar(gca, [1 1], 0.175, mdl{1, 1}.Coefficients.pValue(2), 'black');
 mysigstar(gca, [2 2], 0.15, mdl{1, 1}.Coefficients.pValue(3), 'black');
 mysigstar(gca, [3 3], 0.125, mdl{1, 1}.Coefficients.pValue(4), 'black');
 mysigstar(gca, [4 7], 0.05, mdl{1, 1}.Coefficients.pValue(5), 'black');
 %add stat to figure:
-p=round(coefTest(mdl{1,1}), 3, 'significant');
+p=round(coefTest(mdl{1,1}), 4, 'significant');
 str=['{\it R^2} = ', num2str(round(mdl{1, 1}.Rsquared.Ordinary, 2)), ', {\it p} = ', num2str(round(p, 1, 'significant'))];
 T = text(min(get(gca, 'xlim')), max(get(gca, 'ylim')), str); 
 set(T, 'fontsize', 14, 'verticalalignment', 'top', 'horizontalalignment', 'left');
 box off
-exportgraphics(gcf,[figspath 'Figure5_Mratio_GLM.jpeg'],'Resolution',300)
-
+exportgraphics(gcf,[figspath '\Figure5_Mratio_GLM.jpeg'],'Resolution',300)
 
 %plot the coefficients -DPRIME:
-figure; bar(mdl{1, 2}.Coefficients.Estimate(2:end), 'w'); hold on 
+figure('Renderer', 'painters', 'Position', [0 0 1000 500]); 
+bar(mdl{1, 2}.Coefficients.Estimate(2:end), 'w'); hold on 
 er=errorbar(mdl{1, 2}.Coefficients.Estimate(2:end), mdl{1, 2}.Coefficients.SE(2:end));
 er.Color = [0 0 0]; er.LineStyle = 'none'; 
 title('Perceptual sensitivity (d-prime)'); ylim([-0.2, 0.2]);
 xticklabels(x); set(gca,'xticklabels', x, 'FontSize', 18);
-ylabel('Regression coeffient', 'FontSize', 18);
+ylabel('Effect size', 'FontSize', 18);
 %add stat to figure:
 p=round(coefTest(mdl{1,2}), 3, 'significant');
 str=['{\it R-Sq} = ', num2str(mdl{1, 2}.Rsquared.Ordinary), newline, '{\it R-Sq adj} = ', num2str(mdl{1, 2}.Rsquared.Adjusted), newline, '{\it p} = ', num2str(p)];
@@ -211,7 +220,8 @@ set(T, 'fontsize', 12, 'verticalalignment', 'top', 'horizontalalignment', 'left'
 box off
 
 %plot the coefficients -METAD-PRIME:
-figure; bar(mdl{1, 3}.Coefficients.Estimate(2:end), 'w'); hold on 
+figure('Renderer', 'painters', 'Position', [0 0 1000 500]); 
+bar(mdl{1, 3}.Coefficients.Estimate(2:end), 'w'); hold on 
 er=errorbar(mdl{1, 3}.Coefficients.Estimate(2:end), mdl{1, 3}.Coefficients.SE(2:end));
 er.Color = [0 0 0]; er.LineStyle = 'none'; 
 title('Metacognitive sensitivity');
@@ -221,7 +231,7 @@ mysigstar(gca, [1 1], 0.2, mdl{1, 3}.Coefficients.pValue(2), 'black');
 mysigstar(gca, [2 2], 0.22, mdl{1, 3}.Coefficients.pValue(3), 'black');
 mysigstar(gca, [3 7], 0.1, mdl{1, 3}.Coefficients.pValue(4), 'black');
 ylim([-0.1, 0.3]);
-ylabel('Regression coeffient', 'FontSize', 18);
+ylabel('Effect size', 'FontSize', 18);
 %add stat to figure: 
 p=round(coefTest(mdl{1,3}), 3, 'significant');
 str=['{\it R-Sq} = ', num2str(mdl{1, 3}.Rsquared.Ordinary), newline, '{\it R-Sq adj} = ', num2str(mdl{1, 3}.Rsquared.Adjusted), newline, '{\it p} = ', num2str(p)];
@@ -230,11 +240,12 @@ set(T, 'fontsize', 12, 'verticalalignment', 'top', 'horizontalalignment', 'left'
 box off
 
 %plot the coefficients - CONFIDENCE : 
-figure; bar(mdl{1, 4}.Coefficients.Estimate(2:end), 'w'); hold on 
+figure('Renderer', 'painters', 'Position', [0 0 1000 500]); 
+bar(mdl{1, 4}.Coefficients.Estimate(2:end), 'w'); hold on 
 er=errorbar(mdl{1, 4}.Coefficients.Estimate(2:end), mdl{1, 4}.Coefficients.SE(2:end));
 er.Color = [0 0 0]; er.LineStyle = 'none'; 
 title('Confidence');
-ylabel('Regression coeffient', 'FontSize', 18);
+ylabel('Effect size', 'FontSize', 18);
 x={'HD+', 'Gender (male)', 'Age', 'IQ', 'MMSE', 'HADS-A', 'HADS-D'};
 set(gca,'xticklabels', x, 'FontSize', 18);
 ylim([-0.6, 0.6]);
@@ -248,8 +259,8 @@ end
 
 %%%% SAVE %%%
 if savemodels
-mkdir(modelspath);
-save(fullfile(modelspath, 'fitHC'), 'fitHC');
-save(fullfile(modelspath, 'fitpreHD'), 'fitpreHD');
-save(fullfile(modelspath, 'fitearlyHD'), 'fitearlyHD');
+mkdir(model_dir);
+save(fullfile(model_dir, 'fitHC'), 'fitHC');
+save(fullfile(model_dir, 'fitpreHD'), 'fitpreHD');
+save(fullfile(model_dir, 'fitearlyHD'), 'fitearlyHD');
 end
