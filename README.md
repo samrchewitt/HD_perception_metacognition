@@ -1,4 +1,5 @@
 # HD_perception_metacognition
+open-access article: https://neurologyopen.bmj.com/content/4/1/e000268
 
 Instructions for running and installing HDDM v0:8 via docker:
 https://hub.docker.com/r/hcp4715/hddm
