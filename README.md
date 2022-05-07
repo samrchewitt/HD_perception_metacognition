@@ -10,6 +10,8 @@ docker run -it --rm --cpus=4 -v /c/Users/YOURUSERNAME/PATH_TO_REPO/HD_perception
 
 It's also possible to run HDDM in google colab, this is the easiest way to load our models and data. However, if you want to estimate your own models, you will need Docker as Colab will timeout before models have been estimated. 
 
+The posterior predictive check pickle file (w/ simulated rt data) is too large to upload but can be sent on request. 
+
 HDDM package (python) required for perceptual decision-making model : http://ski.clps.brown.edu/hddm_docs/
 
 Metacognition model:
