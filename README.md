@@ -18,8 +18,9 @@ Hmetad package required for metacognition model implementation: https://github.c
 Task: 
 Meta-dots task used in this study: https://github.com/metacoglab/meta_dots
 
-Notes on ependencies:
+Notes on dependencies:
 I use plotting functions from https://github.com/anne-urai/Tools in behavioural and metacognition model scripts
 
 Fitting models in Hmeta-D depends on JAGS 3.4.0 - see https://github.com/metacoglab/HMeta-d/tree/master/Matlab for instructions
 
+Happy to be contacted if you have questions: s.hewitt.17@ucl.ac.uk
